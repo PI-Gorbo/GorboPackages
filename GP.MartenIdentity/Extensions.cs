@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Hosting;
-
+using Marten;
+using JasperFx.Core;
 namespace GP.MartenIdentity;
 public static class Extensions
 {
-    public static IHostApplicationBuilder Test(this IHostApplicationBuilder builder)
+    public static Marten.StoreOptions RegisterIdentityModels<TUser, TRole>(this Marten.StoreOptions opts)
+        where TUser : MartenIdentityUser
+        where TRole : MartenIdentityRole
     {
-        Console.WriteLine("here");
-        return builder;
+        opts.Schema.For<TUser>().Index(x => x.NormalizedEmail, x => { x.IsUnique = true; });
+        opts.Schema.For<TRole>();
+        return opts;
     }
 }

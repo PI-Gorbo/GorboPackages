@@ -3,3 +3,5 @@ bin
 
 /GP.*/bin
 /GP.*/obj
+
+node_modules
