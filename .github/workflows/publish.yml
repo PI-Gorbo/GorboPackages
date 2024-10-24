@@ -40,8 +40,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Build
-        working-directory: ./GP.$PACKAGE
-        run: dotnet build --configuration Release
+        run: cd ./GP.$PACKAGE && dotnet build --configuration Release
 
       - name: Package
         working-directory: ./GP.$PACKAGE
