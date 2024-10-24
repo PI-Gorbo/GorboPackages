@@ -1,9 +1,9 @@
 ﻿namespace GP.IdentityEndpoints;
 
-public class SuperCoolIdentityClass
+public static class IdentityEndpoints
 {
-    public static string Print()
+    public static IEndpointRouteBuilder RegisterIdentityEndpoints(this IEndpointRouteBuilder application)
     {
-        return "Hello world";
+
     }
 }
