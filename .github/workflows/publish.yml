@@ -39,12 +39,11 @@ jobs:
         run: cd ./GP.$PACKAGE_NAME && dotnet build --configuration Release
 
       - name: Package
-        working-directory: ./GP.$PACKAGE_NAME
-        run: dotnet pack --no-restore --no-build --configuration Release -p:PackageVersion=$VERSION_NUMBER --output .
+        run: cd ./GP.$PACKAGE_NAME && dotnet pack --no-restore --no-build --configuration Release -p:PackageVersion=$VERSION_NUMBER --output .
 
       - name: Publish
-        working-directory: ./GP.$PACKAGE_NAME
         run: >
+          cd ./GP.$PACKAGE_NAME &&
           dotnet nuget push GorboPackages.${{ github.ref_name }}.nupkg
           -s https://nuget.pkg.github.com/PI-Gorbo/index.json
           -k ${{ secrets.NUGET_REPO_AUTH }}
