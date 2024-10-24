@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: publish
+on:
+  push:
+    tags:
+      - "*.*.*"
+    paths: 
+      - "/GP.IdentityEndpoints/"
+
+defaults:
+  run:
+    shell: pwsh
+    working-directory: ./GP.IdentityEndpoints/
+
+jobs:
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build
+        run: dotnet build --configuration Release
+
+      - name: Package
+        run: dotnet pack --no-restore --no-build --configuration Release -p:PackageVersion=${{ github.ref_name }} --output .
+
+      - name: Publish
+        run: >
+          dotnet nuget push GorboPackages.IdentityEndpoints.${{ github.ref_name }}.nupkg
+          -s https://nuget.pkg.github.com/PI-Gorbo/index.json
+          -k ${{ secrets.NUGET_REPO_AUTH }}
