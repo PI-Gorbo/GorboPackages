@@ -4,36 +4,54 @@ name: publish
 on:
   push:
     tags:
-      - "*.*.*"
-    paths: 
-      - "/GP.IdentityEndpoints/"
+      - "*.*.*.*" # First star is the package name, then the version number.
 
 defaults:
   run:
-    shell: pwsh
-    working-directory: ./GP.IdentityEndpoints/
+    shell: bash
 
 jobs:
   build:
     name: Build Package
     runs-on: ubuntu-latest
     steps:
+      - name: Extract package name and version number from tag
+        id: extract_info
+        run: |
+          TAG=${{ github.ref_name }}
+          # Extract the package name (everything before the first dot)
+          PACKAGE=$(echo "${TAG}" | cut -d'.' -f1)
+          # Extract the version number (everything after the first dot)
+          VERSION=$(echo "${TAG}" | cut -d'.' -f2-)
+          
+          echo "Package name extracted: ${PACKAGE}"
+          echo "Version number extracted: ${VERSION}"
+          
+          # Make the PACKAGE and VERSION variables available to other steps
+          echo "PACKAGE_NAME=${PACKAGE}" >> $GITHUB_ENV
+          echo "VERSION_NUMBER=${VERSION}" >> $GITHUB_ENV
+
       - name: Checkout
+        working-directory: ./GP.$PACKAGE
         uses: actions/checkout@v4
 
       - name: Set up .NET Core
+        working-directory: ./GP.$PACKAGE
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
       - name: Build
+        working-directory: ./GP.$PACKAGE
         run: dotnet build --configuration Release
 
       - name: Package
-        run: dotnet pack --no-restore --no-build --configuration Release -p:PackageVersion=${{ github.ref_name }} --output .
+        working-directory: ./GP.$PACKAGE
+        run: dotnet pack --no-restore --no-build --configuration Release -p:PackageVersion=$VERSION_NUMBER --output .
 
       - name: Publish
+        working-directory: ./GP.$PACKAGE
         run: >
-          dotnet nuget push GorboPackages.IdentityEndpoints.${{ github.ref_name }}.nupkg
+          dotnet nuget push GorboPackages.${{ github.ref_name }}.nupkg
           -s https://nuget.pkg.github.com/PI-Gorbo/index.json
           -k ${{ secrets.NUGET_REPO_AUTH }}
