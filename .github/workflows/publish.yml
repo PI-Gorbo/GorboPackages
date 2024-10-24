@@ -6,10 +6,6 @@ on:
     tags:
       - "*.*.*.*" # First star is the package name, then the version number.
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   build:
     name: Build Package
@@ -40,14 +36,14 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Build
-        run: cd ./GP.$PACKAGE && dotnet build --configuration Release
+        run: cd ./GP.$PACKAGE_NAME && dotnet build --configuration Release
 
       - name: Package
-        working-directory: ./GP.$PACKAGE
+        working-directory: ./GP.$PACKAGE_NAME
         run: dotnet pack --no-restore --no-build --configuration Release -p:PackageVersion=$VERSION_NUMBER --output .
 
       - name: Publish
-        working-directory: ./GP.$PACKAGE
+        working-directory: ./GP.$PACKAGE_NAME
         run: >
           dotnet nuget push GorboPackages.${{ github.ref_name }}.nupkg
           -s https://nuget.pkg.github.com/PI-Gorbo/index.json
