@@ -32,11 +32,9 @@ jobs:
           echo "VERSION_NUMBER=${VERSION}" >> $GITHUB_ENV
 
       - name: Checkout
-        working-directory: ./GP.$PACKAGE
         uses: actions/checkout@v4
 
       - name: Set up .NET Core
-        working-directory: ./GP.$PACKAGE
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
