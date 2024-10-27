@@ -12,6 +12,33 @@ type VersionNumber = {
 };
 type Package = { name: string; latestVersion: VersionNumber };
 type PackageIndex = Package[];
+
+// MAIN PROGRAM
+let index = await getPackageIndex();
+const selectProjectOutput = index
+    .map(
+        (info, index) =>
+            `[${index}]\t\t${info.name} - ${info.latestVersion.major}.${info.latestVersion.minor}.${info.latestVersion.patch}`
+    )
+    .join("\n");
+const packageIndex = Number(
+    prompt("Select project to publish: \n" + selectProjectOutput + "\n")
+);
+if (Number.isNaN(packageIndex)) exit(-1);
+
+const incrementType = prompt("[Maj]or, [Min]or, or [Pat]ch?");
+if (incrementType == null || !["Maj", "Min", "Pat"].includes(incrementType)) {
+    console.write("Excited Maj, Min or Pat");
+    exit(-1);
+}
+const relevantPackage = index[packageIndex];
+
+console.write(
+    `Publishing package ${relevantPackage.name}. Incrementing by ${incrementType}\n`
+);
+const updatedPackage = await publishPackage(relevantPackage, incrementType);
+
+// HELPER FUNCTIONS
 async function getPackageIndex(): Promise<PackageIndex> {
     let packageIndex: PackageIndex = [];
 
@@ -73,48 +100,24 @@ async function publishPackage(
         };
     }
 
+
+    // Store the upgraded package index
+    const file = await unlinkSync(packageIndexFileName); // Deletes the file.
+    await Bun.write(
+        packageIndexFileName,
+        JSON.stringify(
+            index.map((p) => (p.name == relevantPackage.name ? updatedPackage : p))
+        )
+    );
+
+    // Push the updates.
+    await $`git commit -am "(index) Updated package index - ${relevantPackage.name} incremented by ${incrementType} to ${pack.latestVersion.major}.${pack.latestVersion.minor}.${pack.latestVersion.patch}"`
+    await $`git push`
+
     // Perform Upgrade
     const tagName = `${pack.name}.${pack.latestVersion.major}.${pack.latestVersion.minor}.${pack.latestVersion.patch}`;
-
     await $`git tag ${tagName}`;
     await $`git push origin ${tagName}`;
 
     return pack;
 }
-
-let index = await getPackageIndex();
-const selectProjectOutput = index
-    .map(
-        (info, index) =>
-            `[${index}]\t\t${info.name} - ${info.latestVersion.major}.${info.latestVersion.minor}.${info.latestVersion.patch}`
-    )
-    .join("\n");
-const packageIndex = Number(
-    prompt("Select project to publish: \n" + selectProjectOutput + "\n")
-);
-if (Number.isNaN(packageIndex)) exit(-1);
-
-const incrementType = prompt("[Maj]or, [Min]or, or [Pat]ch?");
-if (incrementType == null || !["Maj", "Min", "Pat"].includes(incrementType)) {
-    console.write("Excited Maj, Min or Pat");
-    exit(-1);
-}
-const relevantPackage = index[packageIndex];
-
-console.write(
-    `Publishing package ${relevantPackage.name}. Incrementing by ${incrementType}\n`
-);
-const updatedPackage = await publishPackage(relevantPackage, incrementType);
-
-// Store the upgraded package
-const file = await unlinkSync(packageIndexFileName); // Deletes the file.
-await Bun.write(
-    packageIndexFileName,
-    JSON.stringify(
-        index.map((p) => (p.name == relevantPackage.name ? updatedPackage : p))
-    )
-);
-
-// Push the updates.
-await $`git commit -am "(index) Updated package index - ${relevantPackage.name} incremented by ${incrementType}."`
-await $`git push`
