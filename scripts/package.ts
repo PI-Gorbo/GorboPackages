@@ -16,6 +16,7 @@ async function getPackageIndex(): Promise<PackageIndex> {
     let packageIndex: PackageIndex = [];
 
     // Initialize
+    await $`git checkout main`
     const directories = await readdir(Bun.pathToFileURL(".")); // current directory
     const projectDirectories = directories
         .filter((dir) => dir.startsWith("GP.")) // Find all dirs starting with GP.
@@ -113,3 +114,7 @@ await Bun.write(
         index.map((p) => (p.name == relevantPackage.name ? updatedPackage : p))
     )
 );
+
+// Push the updates.
+await $`git commit -am "(index) Updated package index - ${relevantPackage.name} incremented by ${incrementType}."`
+await $`git push`
