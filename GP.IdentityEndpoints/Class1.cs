@@ -2,8 +2,8 @@
 
 public static class IdentityEndpoints
 {
-    public static IEndpointRouteBuilder RegisterIdentityEndpoints(this IEndpointRouteBuilder application)
-    {
+    // public static IEndpointRouteBuilder RegisterIdentityEndpoints(this WebApplication application)
+    // {
 
-    }
+    // }
 }
