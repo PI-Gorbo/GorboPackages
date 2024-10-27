@@ -5,3 +5,5 @@ bin
 /GP.*/obj
 
 node_modules
+
+.idea

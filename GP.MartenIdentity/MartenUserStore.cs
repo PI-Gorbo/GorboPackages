@@ -20,7 +20,7 @@ public class MartenUserStore<TUser, TRole>(IDocumentSession session) :
                                     IUserTwoFactorRecoveryCodeStore<TUser>,
                                     IUserAuthenticatorKeyStore<TUser>,
                                     IQueryableUserStore<TUser>
-                                    where TUser : MartenIdentityUser
+                                    where TUser : MartenIdentityUser<TRole>
                                     where TRole : MartenIdentityRole
 {
 

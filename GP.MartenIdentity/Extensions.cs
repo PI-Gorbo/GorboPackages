@@ -5,7 +5,7 @@ namespace GP.MartenIdentity;
 public static class Extensions
 {
     public static Marten.StoreOptions RegisterIdentityModels<TUser, TRole>(this Marten.StoreOptions opts)
-        where TUser : MartenIdentityUser
+        where TUser : MartenIdentityUser<TRole>
         where TRole : MartenIdentityRole
     {
         opts.Schema.For<TUser>().Index(x => x.NormalizedEmail, x => { x.IsUnique = true; });
