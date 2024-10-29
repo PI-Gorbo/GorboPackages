@@ -20,5 +20,16 @@ module CookieOperations =
             )
         )
         
-        
     let RemoveCookieFromContext (httpContext : HttpContext) = httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme)
+    
+    type ClaimsPrincipal with
+        member this.GetUserId () =
+            this.Claims
+            |> Seq.tryFind (fun c -> c.Type = ClaimTypes.Actor)
+            |> function
+                | Some foundClaim ->
+                    try
+                        Ok(Guid.Parse(foundClaim.Value))
+                    with
+                    | ex -> Error()
+                | None -> Error()
