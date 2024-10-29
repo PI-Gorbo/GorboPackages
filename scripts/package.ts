@@ -106,7 +106,7 @@ async function publishPackage(
     await Bun.write(
         packageIndexFileName,
         JSON.stringify(
-            index.map((p) => (p.name == relevantPackage.name ? updatedPackage : p))
+            index.map((p) => (p.name == relevantPackage.name ? pack : p))
         )
     );
 
