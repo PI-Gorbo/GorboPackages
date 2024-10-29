@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Identity;
-using Marten;
-using JasperFx.Core;
 namespace GP.MartenIdentity;
 public static class Extensions
 {

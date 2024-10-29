@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Utils.fs" />
+    <Compile Include="Operations\Register.fs" />
+    <Compile Include="Operations\EmailPasswordLogin.fs" />
+    <Compile Include="Operations\ResetPassword.fs" />
+    <Compile Include="Operations\CookieOperations.fs" />
+    <Compile Include="Operations\ConfirmEmail.fs" />
+    <Compile Include="Email.fs" />
+    <Compile Include="Extensions.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.18.0" />
+  </ItemGroup>
+
+</Project>

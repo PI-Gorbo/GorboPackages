@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GP.IdentityEndpoints", "GP.IdentityEndpoints\GP.IdentityEndpoints.csproj", "{72AF80FB-8C57-4229-93B5-4ACEC3B7B8A3}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GP.MartenIdentity", "GP.MartenIdentity\GP.MartenIdentity.csproj", "{80223F41-1BAB-4EF6-821C-4C03475AD6C1}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GP.IdentityEndpoints", "GP.IdentityEndpoints\GP.IdentityEndpoints.fsproj", "{856FC2C4-7961-4909-AC6F-6819CCE99A42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{72AF80FB-8C57-4229-93B5-4ACEC3B7B8A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{72AF80FB-8C57-4229-93B5-4ACEC3B7B8A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{72AF80FB-8C57-4229-93B5-4ACEC3B7B8A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{72AF80FB-8C57-4229-93B5-4ACEC3B7B8A3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{80223F41-1BAB-4EF6-821C-4C03475AD6C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{80223F41-1BAB-4EF6-821C-4C03475AD6C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80223F41-1BAB-4EF6-821C-4C03475AD6C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80223F41-1BAB-4EF6-821C-4C03475AD6C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{856FC2C4-7961-4909-AC6F-6819CCE99A42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{856FC2C4-7961-4909-AC6F-6819CCE99A42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{856FC2C4-7961-4909-AC6F-6819CCE99A42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{856FC2C4-7961-4909-AC6F-6819CCE99A42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

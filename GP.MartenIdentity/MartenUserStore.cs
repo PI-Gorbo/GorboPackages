@@ -1,13 +1,10 @@
 using System.Security.Claims;
 using CSharpFunctionalExtensions;
-using JasperFx.Core;
 using Marten;
-using Marten.Linq.Parsing.Operators;
 using Microsoft.AspNetCore.Identity;
 
 namespace GP.MartenIdentity;
 public class MartenUserStore<TUser, TRole>(IDocumentSession session) :
-                                    IUserStore<TUser>,
                                     IUserClaimStore<TUser>,
                                     IUserLoginStore<TUser>,
                                     IUserRoleStore<TUser>,
