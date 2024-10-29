@@ -25,7 +25,7 @@ module CookieOperations =
     type ClaimsPrincipal with
         member this.GetUserId () =
             this.Claims
-            |> Seq.tryFind (fun c -> c.Type = ClaimTypes.Actor)
+            |> Seq.tryFind (fun c -> c.Type = "USERID")
             |> function
                 | Some foundClaim ->
                     try
