@@ -4,12 +4,23 @@ open System
 open System.Text
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.TaskResult
+open GP.IdentityEndpoints.Email
+open Microsoft.AspNetCore.Http.HttpResults
 open Microsoft.AspNetCore.Identity
 open Microsoft.AspNetCore.WebUtilities
 open GP.IdentityEndpoints.Utils
 
 module ConfirmEmail =
 
+    let send<'TUser when 'TUser: not struct and 'TUser: null>
+        (userManager: UserManager<'TUser>)
+        (user: 'TUser)
+        (emailSender: IConfirmEmailSender<'TUser>)
+        =
+        userManager.GenerateEmailConfirmationTokenAsync(user)
+        |> TaskResult.ofTask
+        >>= fun token -> emailSender.SendEmail { user = user; token = token }
+ 
     type ConfirmEmailRequest =
         { userId: Guid
           ConfirmEmailToken: string }
@@ -33,6 +44,6 @@ module ConfirmEmail =
                     )
                     |> mapIdentityResult
                     |> TaskResult.mapError FailedToConfirm
-                    |> TaskResult.map (fun _  -> user)
+                    |> TaskResult.map (fun _ -> user)
                 else
                     TaskResult.ok user

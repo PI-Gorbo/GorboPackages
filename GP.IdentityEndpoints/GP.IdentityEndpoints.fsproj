@@ -8,12 +8,12 @@
 
   <ItemGroup>
     <Compile Include="Utils.fs" />
+    <Compile Include="Email.fs" />
     <Compile Include="Operations\Register.fs" />
     <Compile Include="Operations\EmailPasswordLogin.fs" />
     <Compile Include="Operations\ResetPassword.fs" />
     <Compile Include="Operations\CookieOperations.fs" />
     <Compile Include="Operations\ConfirmEmail.fs" />
-    <Compile Include="Email.fs" />
     <Compile Include="Extensions.fs" />
   </ItemGroup>
 

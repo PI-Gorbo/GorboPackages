@@ -3,11 +3,21 @@
 open System.Text
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.TaskResult
+open GP.IdentityEndpoints.Email
 open Microsoft.AspNetCore.Identity
 open Microsoft.AspNetCore.WebUtilities
 
 module ResetPassword =
 
+    let send<'TUser when 'TUser: not struct and 'TUser: null>
+        (userManager: UserManager<'TUser>)
+        (user: 'TUser)
+        (emailSender: IResetPasswordSender<'TUser>)
+        =
+        userManager.GeneratePasswordResetTokenAsync(user)
+        |> TaskResult.ofTask
+        >>= fun token -> emailSender.SendEmail { user = user; token = token }
+    
     type ResetPasswordRequest =
         { email: string
           password: string

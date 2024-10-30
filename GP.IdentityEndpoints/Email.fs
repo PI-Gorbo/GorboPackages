@@ -7,9 +7,9 @@ module Email =
     type IIdentityEmailSender<'DTO> =
         abstract member SendEmail: 'DTO -> TaskResult<unit, string>
 
-    type VerifyEmailDto<'TUser> = { user: 'TUser; token: string }
-    type IVerifyEmailSender<'TUser> =
-        inherit IIdentityEmailSender<VerifyEmailDto<'TUser>>
+    type ConfirmEmailDto<'TUser> = { user: 'TUser; token: string }
+    type IConfirmEmailSender<'TUser> =
+        inherit IIdentityEmailSender<ConfirmEmailDto<'TUser>>
 
     type ResetPasswordDto<'TUser> = { user: 'TUser; token: string }
     type IResetPasswordSender<'TUser> =
