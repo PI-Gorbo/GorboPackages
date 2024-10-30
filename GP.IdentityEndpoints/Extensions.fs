@@ -6,13 +6,13 @@ open Microsoft.Extensions.DependencyInjection
 module Extensions =
     
     type IServiceCollection with
-        member this.RegisterIdentityEmailSenders<'TUser,'TVerifyEmailSender,'TResetPasswordSender
-            when 'TVerifyEmailSender :> IVerifyEmailSender<'TUser>
-            and 'TVerifyEmailSender : not struct
+        member this.RegisterIdentityEmailSenders<'TUser,'TConfirmEmailSender,'TResetPasswordSender
+            when 'TConfirmEmailSender :> IConfirmEmailSender<'TUser>
+            and 'TConfirmEmailSender : not struct
             and 'TResetPasswordSender :> IResetPasswordSender<'TUser>
             and 'TResetPasswordSender : not struct>
             () =
-            this.AddScoped<IVerifyEmailSender<'TUser>,'TVerifyEmailSender>() |> ignore
+            this.AddScoped<IConfirmEmailSender<'TUser>,'TConfirmEmailSender>() |> ignore
             this.AddScoped<IResetPasswordSender<'TUser>, 'TResetPasswordSender>() |> ignore
         
 
