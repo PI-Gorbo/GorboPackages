@@ -43,5 +43,5 @@ module Utils =
                 TaskResult.error (
                     res.Errors
                     |> Seq.map (fun err -> err.ErrorMessage)
-                    |> (fun errors -> String.concat ", ")
+                    |> String.concat ", "
                 ))
