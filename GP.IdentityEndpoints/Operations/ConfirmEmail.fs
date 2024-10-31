@@ -29,7 +29,7 @@ module ConfirmEmail =
         | UserNotFound
         | FailedToConfirm of error: string
 
-    let confirm<'TUser when 'TUser: not struct and 'TUser: null and 'TUser :> IdentityUser<'TUser>>
+    let confirm<'TUser when 'TUser: not struct and 'TUser: null>
         (userManager: UserManager<'TUser>)
         (request: ConfirmEmailRequest)
         =
@@ -37,13 +37,17 @@ module ConfirmEmail =
         |> TaskResult.ofTask
         |> TaskResult.bindRequireNotNull UserNotFound
         >>= fun user ->
-                if not user.EmailConfirmed then
-                    userManager.ConfirmEmailAsync(
-                        user,
-                        Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.ConfirmEmailToken))
-                    )
-                    |> mapIdentityResult
-                    |> TaskResult.mapError FailedToConfirm
-                    |> TaskResult.map (fun _ -> user)
+            taskResult {
+                let! emailIsConfirmed = userManager.IsEmailConfirmedAsync(user)
+                if not emailIsConfirmed then
+                     return!
+                        userManager.ConfirmEmailAsync(
+                            user,
+                            Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.ConfirmEmailToken))
+                        )
+                        |> mapIdentityResult
+                        |> TaskResult.mapError FailedToConfirm
+                        |> TaskResult.map (fun _ -> user)
                 else
-                    TaskResult.ok user
+                    return user
+            }
