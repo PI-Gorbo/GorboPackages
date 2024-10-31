@@ -19,7 +19,7 @@ module RegisterEndpoint =
         | PasswordInvalid of reason: string
         | GeneralFailure of error: string
 
-    let Register<'TUser when 'TUser: (new: unit -> 'TUser) and 'TUser: not struct and 'TUser: null>
+    let Register<'TUser when 'TUser: (new: unit -> 'TUser) and 'TUser: not struct and 'TUser: null and 'TUser : equality>
         (dto: RegisterDto)
         (userManager: UserManager<'TUser>)
         (modifyUser: 'TUser -> 'TUser)
@@ -30,14 +30,14 @@ module RegisterEndpoint =
             dto.Email
             |> userManager.FindByEmailAsync
             |> TaskResult.ofTask
-            |> TaskResult.bindRequireNotNull EmailAlreadyRegistered
+            |> TaskResult.bindRequireEqual null EmailAlreadyRegistered
             |> TaskResult.ignore
 
         let findByName () =
             dto.Username
             |> userManager.FindByNameAsync
             |> TaskResult.ofTask
-            |> TaskResult.bindRequireNotNull UsernameAlreadyRegistered
+            |> TaskResult.bindRequireEqual null UsernameAlreadyRegistered
             |> TaskResult.ignore
 
         let verifyPassword (user: 'TUser) (password: string) : TaskResult<unit, RegisterFailure> =
