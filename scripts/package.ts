@@ -1,123 +1,67 @@
 import { $ } from "bun";
-import { unlinkSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 import { readdir } from "node:fs/promises";
 import { exit } from "node:process";
 
-const packageIndexFileName = "packageIndex.json";
+// Get the current git branch. Ensure that we are on the 'dev' branch.
+const currentBranch = await getCurrentGitBranch()
+if (currentBranch !== 'dev') {
+    console.error("This script should only be run on the dev branch.")
+    exit(1);
+}
 
-type VersionNumber = {
-    major: number;
-    minor: number;
-    patch: number;
-};
-type Package = { name: string; latestVersion: VersionNumber };
-type PackageIndex = Package[];
 
 // MAIN PROGRAM
-let index = await getPackageIndex();
-const selectProjectOutput = index
-    .map(
-        (info, index) =>
-            `[${index}]\t\t${info.name} - ${info.latestVersion.major}.${info.latestVersion.minor}.${info.latestVersion.patch}`
-    )
-    .join("\n");
-const packageIndex = Number(
-    prompt("Select project to publish: \n" + selectProjectOutput + "\n")
-);
-if (Number.isNaN(packageIndex)) exit(-1);
-
 const incrementType = prompt("[Maj]or, [Min]or, or [Pat]ch?");
 if (incrementType == null || !["Maj", "Min", "Pat"].includes(incrementType)) {
-    console.write("Excited Maj, Min or Pat");
-    exit(-1);
+    console.error("Expected Maj, Min, or Pat.");
+    exit(1);
 }
-const relevantPackage = index[packageIndex];
 
-console.write(
-    `Publishing package ${relevantPackage.name}. Incrementing by ${incrementType}\n`
-);
-const updatedPackage = await publishPackage(relevantPackage, incrementType);
+console.log(`Incrementing by ${incrementType}\n`);
+
+await publishPackage(incrementType as 'Maj' | 'Min' | 'Pat');
 
 // HELPER FUNCTIONS
-async function getPackageIndex(): Promise<PackageIndex> {
-    let packageIndex: PackageIndex = [];
+async function publishPackage(upgradeType : 'Maj' | 'Min' | 'Pat') {
+    const packageJsonPath = `./package.json`;
+    const packageJson = JSON.parse(await readFile(packageJsonPath, "utf-8"));
 
-    // Initialize
-    await $`git checkout main`
-    const directories = await readdir(Bun.pathToFileURL(".")); // current directory
-    const projectDirectories = directories
-        .filter((dir) => dir.startsWith("GP.")) // Find all dirs starting with GP.
-        .map((dir, index) => ({
-            directory: dir.substring(3),
-            index,
-        })); // Grab the thing after GP.
-    const packageIndexFile = Bun.file(packageIndexFileName);
-    if (await packageIndexFile.exists()) {
-        packageIndex = (await packageIndexFile.json()) as PackageIndex;
-    }
+    // Parse version
+    let [major, minor, patch] = packageJson.version.split(".").map(Number);
 
-    // Check that the package index is up-to-date
-    for (let item of projectDirectories) {
-        // Ensure that the item is in the package index.
-        const itemMissing = !packageIndex.find((x) => item.directory == x.name);
-        if (itemMissing) {
-            packageIndex.push({
-                name: item.directory,
-                latestVersion: { major: 1, minor: 0, patch: 0 },
-            });
-        }
-    }
-    // Write package index
-    const writer = packageIndexFile.writer();
-    writer.write(JSON.stringify(packageIndex));
-    writer.flush();
-    writer.end();
-
-    return packageIndex;
-}
-
-async function publishPackage(
-    pack: Package,
-    upgradeType: string
-): Promise<Package> {
     // Increment version
-    if (upgradeType == "Maj") {
-        pack.latestVersion = {
-            major: pack.latestVersion.major + 1,
-            minor: 0,
-            patch: 0,
-        };
-    } else if (upgradeType == "Min") {
-        pack.latestVersion = {
-            ...pack.latestVersion,
-            minor: pack.latestVersion.minor + 1,
-            patch: 0,
-        };
+    if (upgradeType === "Maj") {
+        major++;
+        minor = 0;
+        patch = 0;
+    } else if (upgradeType === "Min") {
+        minor++;
+        patch = 0;
     } else {
-        pack.latestVersion = {
-            ...pack.latestVersion,
-            patch: pack.latestVersion.patch + 1,
-        };
+        patch++;
     }
 
+    const newVersion = `${major}.${minor}.${patch}`;
+    packageJson.version = newVersion;
 
-    // Store the upgraded package index
-    const file = await unlinkSync(packageIndexFileName); // Deletes the file.
-    await Bun.write(
-        packageIndexFileName,
-        JSON.stringify(
-            index.map((p) => (p.name == relevantPackage.name ? pack : p))
-        )
-    );
+    // Save updated package.json
+    await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2), "utf-8");
 
-    // Push the updates.
-    await $`git commit -am "(index) Updated package index - ${relevantPackage.name} incremented by ${incrementType} to ${pack.latestVersion.major}.${pack.latestVersion.minor}.${pack.latestVersion.patch}"`
-    await $`git push`
+    console.log(`Version updated to ${newVersion}`);
 
-    // Perform Upgrade
-    const tagName = `${pack.name}.${pack.latestVersion.major}.${pack.latestVersion.minor}.${pack.latestVersion.patch}`;
+    // Commit and tag
+    await $`git add ${packageJsonPath}`;
+    await $`git commit -m "script: bump version to ${newVersion}"`;
+    const tagName = `${newVersion}`;
     await $`git tag ${tagName}`;
     await $`git push origin ${tagName}`;
+    console.log(`Published and tagged ${tagName}`);
+    
+    console.log("Now creating a PR into main.")
+}
 
-    return pack;
+async function getCurrentGitBranch() {
+    const branchOutput = await $`git rev-parse --abbrev-ref HEAD`.text();
+    return branchOutput.trim()
 }
